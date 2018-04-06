@@ -1,0 +1,41 @@
+.hours {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  font-size: 0.9em;
+  font-weight: 700;
+  color: #fff;
+  background: lightseagreen;
+  border: none;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  right: 40px;
+}
+
+.DayPicker-Month .DayPicker-Caption {
+  text-align: center;
+}
+
+.hours-none {
+  display: none;
+}
+
+.hours-small {
+  background:lightslategray;
+}
+
+.hourse-medium {
+  background: lightblue;
+}
+
+.hours-lagre {
+  background: lightcoral;
+}
+
+.DayPicker-Weekday {
+  text-align: left;
+}

@@ -1,0 +1,2 @@
+export const INIT_LOGGED_USER = 'INIT_LOGGED_USER';
+export const INIT_FIRM_NAME = 'INIT_FIRM_NAME';
