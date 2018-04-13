@@ -1,48 +1,50 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import propTypes from 'prop-types'
+import { compose } from 'redux'
+import { firebaseConnect, isLoaded, getVal } from 'react-redux-firebase'
 import './styles.css'
-import { initializeCompanyName } from '../../../actions/initializationActions'
+import { defaultName, defaultCompanyKey } from '../../../constants'
 
 class CompanyName extends Component {
-  constructor(props){
-    super(props);
-  }
-
-  componentWillMount() {
-    const { onInitCompanyName } = this.props;
-    onInitCompanyName();
+  componentWillUpdate() {
+    const companyKey = this.props.profile.companyKey;
+    if (companyKey) {
+      this.props.onGetUserCompany(companyKey);
+    }
   }
 
   render() {
+    /*isLoaded(this.props.company)
+    ? console.log(this.props.company)
+    : console.log(`companies not loaded`); */
+
     const companyName = this.props.companyName
      ? <span>{this.props.companyName}</span>
-     : <span>No Company</span>
+     : <span>{defaultName}</span>
 
     return (
       <div className="home-link">
-        <Link to='/dashboard'>{companyName}</Link>
+        <Link to='/reports'>{companyName}</Link>
       </div>
     )
   }
 }
 
-postMessage.propTypes = {
-  onInitCompanyName: propTypes.func.isRequired,
-  companyName: propTypes.string.isRequired
-}
-
-const mapStateToProps = (state) => ({
-  companyName: state.initializationData.companyName.companyName
-});
-
-const mapDispatchToProps = (dispatch) => {
+const mapStateToProps = (state) => {
   return {
-    onInitCompanyName: () => {
-      dispatch(initializeCompanyName())
-    }
-  };
+    profile: getVal(state.firebase, 'profile'),
+  } 
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(CompanyName);
+
+const mapDispatchToProps = dispatch => {
+  getUserCompany: (companyKey) => dispatch(getUserCompany(companyKey))
+}
+
+export default compose(
+  firebaseConnect(() => ([
+   // `companies`
+  ])),
+  connect(mapStateToProps)
+)(CompanyName)

@@ -1,3 +1,4 @@
+
 .hours {
   display: flex;
   justify-content: center;
@@ -35,6 +36,23 @@
 .hours-lagre {
   background: lightcoral;
 }
+
+
+.cell {
+  height: 70px;
+  width: 70px;
+  position: relative;
+}
+
+.date {
+  position: absolute;
+  font-size: 20px;
+}
+
+.hours {
+  font-size: 0.8em;
+  text-align: left;
+};
 
 .DayPicker-Weekday {
   text-align: left;

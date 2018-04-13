@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
-import initializeReducer from './initializeReducer';
+import { firebaseReducer } from 'react-redux-firebase';
 
 export default combineReducers({
-  initializationData: initializeReducer
-});
+  firebase: firebaseReducer
+})

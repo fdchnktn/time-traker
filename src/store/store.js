@@ -1,15 +1,34 @@
-import { createStore, compose } from 'redux'
+import { applyMiddleware, createStore, compose } from 'redux'
+import { reactReduxFirebase, getFirebase } from 'react-redux-firebase'
 import thunk from 'redux-thunk'
-import logger from 'redux-logger'
+import firebase from 'firebase'
 import rootReducer from '../reducers'
-import { applyMiddleware } from '../../../../.cache/typescript/2.7/node_modules/redux';
+import { firebaseConfig } from '../firebaseConfig'
 
-const intialState = {};
+const initialState = {};
+
+const config = {
+  userProfile: 'users',
+  attachAuthIsReady: true,
+  profileFactory: (userData, profileData) => {
+    return {
+      email: userData.email,
+      userName: profileData.userName,
+      company: profileData.companyKey
+    }
+  }
+};
+
+firebase.initializeApp(firebaseConfig);
 
 const store = createStore(
   rootReducer,
+  initialState,
   compose(
-    applyMiddleware(logger, thunk)
+    applyMiddleware(
+      thunk.withExtraArgument(getFirebase)
+    ),
+    reactReduxFirebase(firebase, config),
   )
 );
 

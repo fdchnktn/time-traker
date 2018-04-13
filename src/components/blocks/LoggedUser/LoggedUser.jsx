@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
+import { firebaseConnect } from 'react-redux-firebase'
 import './styles.css'
 import '../../../styles/elements.css'
 
-export default class LoggedUser extends Component {
+class LoggedUser extends Component {
   constructor(props) {
     super(props);
 
@@ -10,7 +11,7 @@ export default class LoggedUser extends Component {
   }
 
   onLogOut() {
-    this.props.logOut();
+    this.props.firebase.logout();
   }
 
   render() {
@@ -26,3 +27,5 @@ export default class LoggedUser extends Component {
     )
   }
 }
+
+export default firebaseConnect()(LoggedUser)

@@ -1,47 +1,34 @@
 import React, { Component } from 'react'
-import cookie from 'react-cookies'
+import { firebaseConnect, getVal } from 'react-redux-firebase'
+import { connect } from 'react-redux'
+import { compose } from 'redux'
 import './styles.css'
 import LoggedUser from '../../blocks/LoggedUser/LoggedUser'
 import SignIn from '../../inputs/buttons/SignIn/SignIn'
 import SignUp from '../../inputs/buttons/SignUp/SignUp'
-import { changeCookies } from '../../../events'
 
-export default class Authorization extends Component {
-  constructor(props) {
-    super(props);
-
-    this.logOut = this.logOut.bind(this);
-    this.onTriggerEvent = this.onTriggerEvent.bind(this);
-  }
-
-  componentDidMount() {
-    const signInControlElem = document.getElementById('signIn-control');
-    signInControlElem.addEventListener(changeCookies, this.onTriggerEvent.bind(this));
-  }
-
-  onTriggerEvent() {
-    this.setState({userName: cookie.load('userName')});  
-  }
-
-  logOut() {
-    this.setState({userName: ''});
-    cookie.remove('userName');
-  }
-
-  render() {
-    const signInControl = this.state && this.state.userName ? (
+class Authorization extends Component {
+  render() { 
+    const authorization = this.props.profile && this.props.profile.userName ? (
       <LoggedUser
-        userName={this.state.userName} 
-        logOut={this.logOut}/>
+        userName={this.props.profile.userName} />
     ) : (
-      <div className="signIn-control">
+      <div className="sign-buttons">
         <SignIn />
         <SignUp />
       </div>
     );
 
     return (
-      <div id="signIn-control">{ signInControl }</div>
+      <div id="sign-buttons">{ authorization }</div>
     )
   }
 }
+
+export default compose(
+  firebaseConnect(),
+  connect((state) => ({
+    auth: getVal(state.firebase, 'auth'),
+    profile: getVal(state.firebase, 'profile')
+  }))
+)(Authorization);

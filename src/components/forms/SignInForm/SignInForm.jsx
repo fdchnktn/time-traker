@@ -1,21 +1,17 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
-import cookie from 'react-cookies'
 import Loader from 'react-loader-spinner'
+import { withFirebase } from 'react-redux-firebase'
 import TextField from 'material-ui/TextField'
 import RaisedButton from 'material-ui/RaisedButton'
-import firebase from 'firebase'
-import 'firebase/database'
 import './styles.css'
 import '../../../styles/elements.css'
-import * as mockUsers from './mock.json'
-import { changeCookies } from '../../../events'
 
-export default class signInForm extends Component {
+class SignInForm extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { 
+    this.state = {
       email: '',
       password: '',
       userName: '',
@@ -31,18 +27,6 @@ export default class signInForm extends Component {
     this.signInUser = this.signInUser.bind(this);
   }
 
-  onSignIn(userName) {
-    this.triggerEvent();
-  }
-
-  triggerEvent() {
-    const event = new Event('Event');
-    event.initEvent(changeCookies);
-
-    const signInControlElem = document.getElementById('signIn-control');
-    signInControlElem.dispatchEvent(event);
-  }
-
   handleInputChange(event) {
     const value = event.target.value;
     const name = event.target.name;
@@ -50,16 +34,16 @@ export default class signInForm extends Component {
     this.setState({
       [name]: value
     },
-    () => {this.validateField(name, value)});
+      () => { this.validateField(name, value) });
   }
 
   validateField(fieldName, value) {
     let validationErrors = this.state.error;
 
-    switch(fieldName) {
+    switch (fieldName) {
       case 'email':
         validationErrors = (value === '')
-          ? '' 
+          ? ''
           : wrongCharacter(value) || shortField(value) || wrongEmail(value);
         break;
       default:
@@ -68,8 +52,8 @@ export default class signInForm extends Component {
 
     this.setState({
       error: validationErrors
-    }, 
-    () => { this.hasErrors(); });
+    },
+      () => { this.hasErrors(); });
 
     function shortField(value) {
       return (value.length >= 6 && value.length <= 30)
@@ -92,113 +76,85 @@ export default class signInForm extends Component {
 
   hasErrors() {
     if (!this.state.error && this.state.email && this.state.password) {
-      this.setState({formInvalid: false});
+      this.setState({ formInvalid: false });
     }
   }
 
   handleSubmit(event) {
-    this.signInUser(this.state.email, this.state.password);
-    
-    this.setState({ isLoading : true });
-    this.getUserNameIfUserExist().then(userName => {
-      this.setState({
-        isError : false,
-        isLoading: false,
-        redirect: true
-      });
-      this.onsignIn(userName);
-    }).catch(() => {
-      this.setState({
-        isError : true,
-        isLoading: false
-      });
+    this.setState({ 
+      isLoading: true 
     });
+
+    this.signInUser(this.state.email, this.state.password);
 
     event.preventDefault();
   }
 
+
   signInUser(email, password) {
-    firebase.auth().signInWithEmailAndPassword(email, password)
-      .then((data) => {
-        console.log(`You logged In`, data);
-      })
-      .catch(function(error) {
-        const errorCode = error.code;
-        const errorMessage = error.message;
+    this.props.firebase.login({ 
+      email,
+      password 
+    }).then((data) => {
+      console.log(`User with id : ${data.user.uid} just signed`);
 
-        if (errorCode === 'auth/wrong-password') {
-          alert('Wrong password.');
-        } else {
-          alert(errorMessage);
-        }
-        
-        console.log(error);
-    });
-  }
+      this.setState({
+        isError : false,
+        isLoading: false,
+        redirect: true
+      }); 
+    }).catch(err => {
+      console.log(err);
 
-  getUserNameIfUserExist() {
-    return new Promise((resolve, reject) => {
-      let userName = '';
-      mockUsers.map(user => {
-        if (user.email === this.state.email && user.password === this.state.password) {
-          return userName = user.userName;
-        } 
+      this.setState({
+        isError : true,
+        isLoading: false
       });
-      
-      userName
-        ? resolve(userName)
-        : reject();
-    });
+    })
   }
 
   render() {
-    const errorMessage = this.state.isError ? (
-      "signIn or password incorrect"
-    ) : (
-      null
-    );
-
     const renderRedirect = this.state.redirect ? (
-      <Redirect to='/dashboard' />
+      <Redirect to='/reports' />
     ) : (
       null
     );
 
     const content = this.state.isLoading ? (
-      <Loader 
+      <Loader
         type="Puff"
         color="#00BFFF"
-        height="100"	
+        height="100"
         width="100"
-      />   
+      />
     ) : (
-      <div className="form-container">
-        <form id="form" onSubmit={this.handleSubmit}> 
-        {renderRedirect}
-        <h3 className="form-header">Log In</h3>
-          <TextField
-            hintText="Email"
-            name="email"
-            type="text"
-            floatingLabelText="Email"
-            value={this.state.email}
-            onChange={this.handleInputChange} 
-            errorText={this.state.error}
-          /><br />
-          <TextField
-            hintText="Password"
-            name="password"
-            floatingLabelText="Password"
-            type="password"
-            value={this.state.password}
-            onChange={this.handleInputChange}
-          /><br />
-          <div className="submit-button">
-            <RaisedButton label="Sumbit" primary={true} onClick={this.handleSubmit} disabled={this.state.formInvalid} />
-          </div>
-        </form> 
-      </div>
-    );
+        <div className="form-container">
+          <form id="form" onSubmit={this.handleSubmit}>
+            {renderRedirect}
+            <h3 className="form-header">Log In</h3>
+            <TextField
+              hintText="Email"
+              name="email"
+              type="text"
+              floatingLabelText="Email"
+              value={this.state.email}
+              onChange={this.handleInputChange}
+              errorText={this.state.error}
+            /><br />
+            <TextField
+              hintText="Password"
+              name="password"
+              floatingLabelText="Password"
+              type="password"
+              value={this.state.password}
+              onChange={this.handleInputChange}
+            /><br />
+            <div className="submit-button">
+              <RaisedButton label="Sumbit" primary={true} onClick={this.handleSubmit} disabled={this.state.formInvalid} />
+            </div>
+          </form>
+        </div>
+      );
 
     return (
       <div>
@@ -207,3 +163,5 @@ export default class signInForm extends Component {
     )
   }
 }
+
+export default withFirebase(SignInForm)

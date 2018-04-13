@@ -1,15 +1,15 @@
 import React, { Component } from 'react'
 import './styles.css'
-import TimeTrackButton from '../../inputs/buttons/TimeTrackButtom/TimeTrackButton'
+import MakeReport from '../../inputs/buttons/MakeReport/MakeReport'
 import CalendarContainer from '../CalendarContainer/CalendarContainer'
 
-export default class TimeTrackingDashboard extends Component {
+export default class ReportsDashboard extends Component {
   render() {
     return (
       <div className="container">
         <div className="dashboard">
           <CalendarContainer />
-          <TimeTrackButton />
+          <MakeReport />
         </div>
       </div>
     )

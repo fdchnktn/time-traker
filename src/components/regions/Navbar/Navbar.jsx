@@ -7,7 +7,7 @@ class Navbar extends Component {
   render() {
     return (
       <div className="Navbar">
-        <CompanyName />
+        <CompanyName /> 
         <Authorization />
       </div>
     )
