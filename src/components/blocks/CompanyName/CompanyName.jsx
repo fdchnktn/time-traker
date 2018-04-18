@@ -1,25 +1,22 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { compose } from 'redux'
-import { firebaseConnect, isLoaded, getVal } from 'react-redux-firebase'
+import { isLoaded, getVal, isEmpty } from 'react-redux-firebase'
 import './styles.css'
-import { defaultName, defaultCompanyKey } from '../../../constants'
+import { defaultName } from '../../../constants'
+import { getUserCompany } from '../../../actions/companyAction'
 
 class CompanyName extends Component {
-  componentWillUpdate() {
-    const companyKey = this.props.profile.companyKey;
-    if (companyKey) {
-      this.props.onGetUserCompany(companyKey);
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.profile !== this.props.profile) {
+      const { dispatch, profile } = nextProps;
+      profile.company && this.props.getUserCompany(profile.company);
     }
   }
 
   render() {
-    /*isLoaded(this.props.company)
-    ? console.log(this.props.company)
-    : console.log(`companies not loaded`); */
-
-    const companyName = this.props.companyName
+    const companyName = isLoaded(this.props.companyName) && !isEmpty(this.props.profile)
      ? <span>{this.props.companyName}</span>
      : <span>{defaultName}</span>
 
@@ -34,17 +31,15 @@ class CompanyName extends Component {
 const mapStateToProps = (state) => {
   return {
     profile: getVal(state.firebase, 'profile'),
+    companyName: state.company.name
   } 
 };
 
 
 const mapDispatchToProps = dispatch => {
-  getUserCompany: (companyKey) => dispatch(getUserCompany(companyKey))
+  return {
+    getUserCompany: (companyKey) => dispatch(getUserCompany(companyKey))
+  }
 }
 
-export default compose(
-  firebaseConnect(() => ([
-   // `companies`
-  ])),
-  connect(mapStateToProps)
-)(CompanyName)
+export default connect(mapStateToProps, mapDispatchToProps)(CompanyName)

@@ -25,10 +25,6 @@ form {
   color: white;
 }
 
-.error-message {
-  color: red;
-}
-
 .submit-button {
   display: flex;
   justify-content: center;

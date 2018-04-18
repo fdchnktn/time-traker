@@ -13,6 +13,10 @@ class Calendar extends Component {
     this.renderDay = this.renderDay.bind(this);
   }
 
+  componentWillReceiveProps(nextProps) {
+    console.log(nextProps);
+  }
+
   handleMonthChange(date){
     this.props.onMonthChange(date);  
   }
@@ -35,19 +39,32 @@ class Calendar extends Component {
   
       return hoursClass;
     }
+
+    const getHoursByDay = (date) => {
+      let hours = 0;
+      this.props.reports &&
+      this.props.reports.map((report) => {
+          if (report.date === date) {
+            hours = report.hours;
+          }
+        })
+
+      return hours;
+    }
+
+    console.log(this.props.reports)
+    const hours = getHoursByDay(date);
+    console.log(hours);
+
   
     return (
       <div className="cell">
         <div className="date">
           {date}
         </div>
-        { this.props.workingHours[date] &&
-          this.props.workingHours[date].map((hours, i) => (
-            <div className={ getClassForHours(hours) } key={ i } >
-              {hours}
-            </div>
-          ))
-        }
+        <div className={ getClassForHours(hours) } >
+          {hours}
+        </div>
       </div>
     );
   }  

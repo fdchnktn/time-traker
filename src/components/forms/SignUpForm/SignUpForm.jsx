@@ -46,18 +46,15 @@ class SignUpForm extends Component {
     this.setState({
       companyState: {
         isNew: true,
-        key: ''
       }
     });
     this.setAndValidateFields('companyName', value);
   }
 
   handleNewRequest(company) {
-    console.log(company);
     this.setState({
-      companyName: '',
       companyState: {
-        key: company.key,
+        key: company.value,
         isNew: false
       }
     });
@@ -88,7 +85,7 @@ class SignUpForm extends Component {
       case 'companyName':
         validationErrors.company = (value === '')
           ? ''
-          : wrongCharacter(value)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         || checkLettersInName();
+          : wrongCharacter(value) || shortField(value)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            || checkLettersInName();
           break;
       case 'email':
         validationErrors.email = (value === '')
@@ -109,10 +106,10 @@ class SignUpForm extends Component {
         break;
     }
 
-    this.setState({
-      errors: validationErrors
-    },
-    () => { this.hasErrors() });
+    this.setState(
+      { errors: validationErrors },
+      () => { this.hasErrors() }
+    );
 
     function checkLettersInName() {
       return (value.match(/^[0-9_]+$/))
@@ -140,13 +137,13 @@ class SignUpForm extends Component {
   }
 
   hasErrors() {
-    (this.state.userName && this.state.email &&
-     this.state.password && this.state.confirmPassword &&
-     !this.state.errors.userName && !this.state.errors.email &&
-     !this.state.errors.password && !this.state.errors.confirmPassword &&
-     this.state.companyName && !this.state.errors.company)
-      ? this.setState({formInvalid: false})
-      : this.setState({formInvalid: true});
+    ( this.state.userName && !this.state.errors.userName && 
+      this.state.email && !this.state.errors.email &&
+      this.state.password && this.state.confirmPassword &&
+      !this.state.errors.password && !this.state.errors.confirmPassword &&
+      !this.state.errors.company && (this.state.companyName || this.state.companyState.key))
+        ? this.setState({formInvalid: false})
+        : this.setState({formInvalid: true});
   }
 
   handleSubmit(event) {
@@ -162,7 +159,7 @@ class SignUpForm extends Component {
       companyName: '',
       companyState: {
         isNew: true,
-        id: ''
+        key: ''
       },
       email: '',
       password: '',
@@ -173,9 +170,10 @@ class SignUpForm extends Component {
   }
 
   createNewUserAndSetCompany(email, password, userName, companyName, companyState) {
+    console.log(`company state`, companyState);
     if (companyState.isNew){
-      this.addCompany(companyName).then(key => {
-        this.createNewUser(email, password, userName, key)
+      this.addCompany(companyName).then(companyKey => {
+        this.createNewUser(email, password, userName, companyKey)
       })
     } else {
       this.createNewUser(email, password, userName, companyState.key);
@@ -185,7 +183,6 @@ class SignUpForm extends Component {
   addCompany(name) {
     return this.props.firebase.push(`companies`, { name })
     .then(result => {
-      console.log(`Company ${result} added to database with key ${result.key}`);
       return result.key;
     }).catch(err => {
       console.log(err);
@@ -193,7 +190,6 @@ class SignUpForm extends Component {
   }
 
   createNewUser(email, password, userName, companyKey) {
-    console.log(email, password, companyKey)
     this.props.firebase.createUser(
       { email, password },
       { userName, email, companyKey}
@@ -204,12 +200,20 @@ class SignUpForm extends Component {
     })
   }
 
+  createCompanyList(companies) {
+    let companyList = [];
+    for (const key in companies) {
+      if (companies.hasOwnProperty(key)) {
+        companyList.push({name: companies[key].name, value: key});
+      }
+    }
+    return companyList;
+  }
+
   render() {
-    const companiesList = this.props.companies && isLoaded(this.props.companies)
-      ? this.props.companies.map((company) => {
-          return {name: company.value.company, key: company.key }
-        })
-      : [];
+    const companiesList = isLoaded(this.props.companies)
+      ? this.createCompanyList(this.props.companies)
+      : []
     
     return (
       <div className="form-container">
@@ -226,13 +230,11 @@ class SignUpForm extends Component {
           <AutoComplete
             hintText="Company"
             name="companyName"
+            searchText={this.state.companyName}
             value={this.state.companyName}
             floatingLabelText="Company"
             filter={AutoComplete.fuzzyFilter}
-            dataSourceConfig={{
-              text: 'name',
-              value: 'key'
-            }}
+            dataSourceConfig={{ text: 'name', value: 'key' }}
             dataSource={companiesList}
             maxSearchResults={5}
             onUpdateInput={(value) => { this.handleUpdateAutoComplete(value) }}
@@ -279,8 +281,7 @@ export default compose(
     'companies' 
   ]),
   connect((state) => ({
-    companies: state.firebase.ordered.companies
-  })
-  )
+    companies: state.firebase.data.companies
+  }))
 )(SignUpForm);
 

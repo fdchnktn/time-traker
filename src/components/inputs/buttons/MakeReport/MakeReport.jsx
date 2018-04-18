@@ -43,7 +43,7 @@ class MakeReport extends Component {
 
   makeNewReport(date, hours) {
     return {
-      date: date.toString(),
+      date: date.getTime(),
       hours
     }
   }

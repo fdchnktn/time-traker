@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import './styles/core.scss';
 import Navbar from './components/regions/Navbar/Navbar';
 import Router from './components/routes/router';
 
