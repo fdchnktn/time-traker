@@ -6,7 +6,10 @@ import Dialog from 'material-ui/Dialog'
 import FlatButton from 'material-ui/FlatButton'
 import DatePicker from 'material-ui/DatePicker'
 import Slider from 'material-ui/Slider'
-import './styles.css'
+import { sendReportDateToCalendar } from '../../../../actions/reportsAction'
+import styles from 'theme.js'
+import './styles.scss'
+
 
 
 class MakeReport extends Component {
@@ -38,10 +41,11 @@ class MakeReport extends Component {
 
   handleSubmit = () => {
     this.setState({open: false});
-    this.props.firebase.push(`reports/${this.props.auth.uid}`, this.makeNewReport(this.state.date, this.state.hours));
+    this.props.firebase.push(`reports/${this.props.auth.uid}`, this.newReport(this.state.date, this.state.hours));
+    this.props.sendReportDateToCalendar(this.state.date);
   }
 
-  makeNewReport(date, hours) {
+  newReport(date, hours) {
     return {
       date: date.getTime(),
       hours
@@ -75,11 +79,6 @@ class MakeReport extends Component {
       />,
     ];
 
-    const customContentStyle = {
-      width: '50%',
-      maxWidth: 'none',
-    };
-
     return (
       <div>
         <button className="circle" onClick={this.handleOpen}>
@@ -91,21 +90,23 @@ class MakeReport extends Component {
           modal={false}
           open={this.state.open}
           onRequestClose={this.handleClose} 
-          contentStyle={customContentStyle}
+          contentStyle={styles.dialogStyle}
           >
-          <form>
+          <form >
             <p>Date: </p>
             <DatePicker 
               hintText="Date Picker"
               onChange={this.onChangeDate}
               defaultDate={this.state.date} />
             <p>Hours: {this.state.hours}</p>
-            <Slider 
-              name="Hours"
-              max={24}
-              step={0.5}
-              value={this.state.hours}
-              onChange={this.onChangeHours} />
+            <div className="slider">
+              <Slider 
+                name="Hours"
+                max={24}
+                step={0.5}
+                value={this.state.hours}
+                onChange={this.onChangeHours} />
+            </div>
           </form>
         </Dialog>
       </div>
@@ -113,13 +114,21 @@ class MakeReport extends Component {
   }
 }
 
-export default compose(
-  firebaseConnect(() => [
-  'reports'
-  ]),
-  connect((state) => {
-    return {
-      auth: getVal(state.firebase, 'auth')
+
+const mapStateToProps = (state) => {
+  return {
+    auth: getVal(state.firebase, 'auth')
+  } 
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    sendReportDateToCalendar: (date) => {
+      dispatch(sendReportDateToCalendar(date))
     }
-  })
-)(MakeReport);
+  }
+}
+
+export default compose(
+  firebaseConnect([ 'reports' ]),
+  connect(mapStateToProps, mapDispatchToProps))(MakeReport);

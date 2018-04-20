@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { firebaseConnect } from 'react-redux-firebase'
-import './styles.css'
-import '../../../styles/elements.css'
+import './styles.scss'
 
 class LoggedUser extends Component {
   constructor(props) {
@@ -16,13 +15,19 @@ class LoggedUser extends Component {
 
   render() {
     return (
-      <div className="logged-user">
-        <p className="userName">{ this.props.userName }</p>
-        <input 
-          className="nav-button"
-          type="submit"
-          value="Log out"
-          onClick={ this.onLogOut }/>
+      <div className="flex-row-center">
+        <div>
+          <p className="userName">
+            {this.props.userName}
+          </p>
+        </div>
+        <div>
+          <input 
+            className="nav-button"
+            type="submit"
+            value="Log out"
+            onClick={ this.onLogOut } />
+        </div>
       </div>
     )
   }

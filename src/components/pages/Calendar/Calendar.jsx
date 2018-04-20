@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import DayPicker from 'react-day-picker'
-import Weekday from './Weekday/Weekday'
+import Weekday from 'components/pages/Calendar/Weekday/Weekday'
 import 'react-day-picker/lib/style.css'
-import './styles.css'
+import './styles.scss'
 
 
 class Calendar extends Component {
@@ -14,7 +14,7 @@ class Calendar extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps);
+    console.log(`nextProps`, nextProps);
   }
 
   handleMonthChange(date){
@@ -40,41 +40,54 @@ class Calendar extends Component {
       return hoursClass;
     }
 
-    const getHoursByDay = (date) => {
+    const getHoursByDate = (date) => {
       let hours = 0;
-      this.props.reports &&
-      this.props.reports.map((report) => {
-          if (report.date === date) {
-            hours = report.hours;
-          }
-        })
-
+      if (this.props.reports) { 
+        hours = this.props.reports.find((report, index) => {
+          return (report.date === date)
+            ? true
+            : false;
+        });
+      }
+      
       return hours;
     }
 
-    console.log(this.props.reports)
-    const hours = getHoursByDay(date);
-    console.log(hours);
+    const getHoursByDay = (day) => {
+      const report = this.props.reports.find((report, index) => {
+        return report.day === day
+          ? true
+          : false;
+      })
 
-  
+      return report
+        ? report.hours
+        : 0;
+    }
+
+    const hours = getHoursByDay(date);
+
     return (
       <div className="cell">
         <div className="date">
           {date}
         </div>
-        <div className={ getClassForHours(hours) } >
+        <div className={ getClassForHours(hours) }>
           {hours}
-        </div>
+        </div>        
       </div>
     );
   }  
     
   render() {
     return (
-      <DayPicker
-        weekdayElement={ <Weekday /> }
-        renderDay={this.renderDay}
-        onMonthChange={this.handleMonthChange} />
+      <div>
+         <DayPicker
+          weekdayElement={ <Weekday /> }
+          renderDay={this.renderDay}
+          onMonthChange={this.handleMonthChange}
+          month={this.props.currentDate} />
+      </div>
     )
   }
 }

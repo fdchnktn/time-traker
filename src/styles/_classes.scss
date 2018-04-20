@@ -1,0 +1,49 @@
+@import 'standard-classes';
+
+.navbar {
+  color: $navbarText;
+  background-color: $navbarBackground;
+  font-size: $fontSize;
+}
+
+.nav-button {
+  @extend .navbar;
+  border: 1px solid $navbarBorder;
+  border-radius: $borderRaduis;
+  border-spacing: inherit;
+  margin-left: $smallMargin;
+  padding: $smallPadding;
+}
+
+
+.form-container {
+  @extend .flex-column-center;
+}
+
+.form-header {
+  justify-self: center;
+}
+
+.form-body {
+}
+
+.form-footer {
+  justify-self: center;
+}
+
+.circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  border: none;
+}
+
+.page-container {
+  width: $marginToRight - $marginToLeft;
+  margin-left: $marginToLeft;
+}
+
+
+
+

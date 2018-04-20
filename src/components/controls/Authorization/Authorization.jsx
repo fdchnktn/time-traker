@@ -2,10 +2,10 @@ import React, { Component } from 'react'
 import { firebaseConnect, getVal } from 'react-redux-firebase'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
-import './styles.css'
-import LoggedUser from '../../blocks/LoggedUser/LoggedUser'
-import SignIn from '../../inputs/buttons/SignIn/SignIn'
-import SignUp from '../../inputs/buttons/SignUp/SignUp'
+import LoggedUser from 'components/blocks/LoggedUser/LoggedUser'
+import SignIn from 'components/inputs/buttons/SignIn/SignIn'
+import SignUp from 'components/inputs/buttons/SignUp/SignUp'
+import './styles.scss'
 
 class Authorization extends Component {
   render() { 
@@ -13,14 +13,16 @@ class Authorization extends Component {
       <LoggedUser
         userName={this.props.profile.userName} />
     ) : (
-      <div className="sign-buttons">
+      <div className="flex-row">
         <SignIn />
         <SignUp />
       </div>
     );
 
     return (
-      <div id="sign-buttons">{ authorization }</div>
+      <div className="authorization">
+        {authorization}
+      </div>
     )
   }
 }

@@ -2,11 +2,13 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
 import { firebaseConnect, isLoaded } from 'react-redux-firebase'
+import { Redirect } from 'react-router-dom'
+import Snackbar from 'material-ui/Snackbar';
 import TextField from 'material-ui/TextField'
 import RaisedButton from 'material-ui/RaisedButton'
 import AutoComplete from 'material-ui/AutoComplete'
-import './styles.css'
-import '../../../styles/elements.css'
+import './styles.scss'
+import 'styles/elements.css'
 
 class SignUpForm extends Component {
   constructor(props) {
@@ -29,7 +31,9 @@ class SignUpForm extends Component {
         email: '',
         password: '',
         confirmPassword: ''
-      }
+      },
+      redirect: false,
+      openSnackbar: false
     }
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -163,7 +167,8 @@ class SignUpForm extends Component {
       },
       email: '',
       password: '',
-      confirmPassword: ''
+      confirmPassword: '',
+      redirect: false
     });
 
     event.preventDefault();
@@ -194,7 +199,11 @@ class SignUpForm extends Component {
       { email, password },
       { userName, email, companyKey}
     ).then((createdUser) => {
-      console.log(createdUser);
+      console.log(`user succesfully created`, createdUser);
+      this.setState({
+        redirect: true,
+        openSnackbar: true
+      })
     }).catch(err => {
       console.log(err);
     })
@@ -211,67 +220,84 @@ class SignUpForm extends Component {
   }
 
   render() {
+    const renderRedirect = this.state.redirect ? (
+      <Redirect to='/reports' />
+    ) : (
+      null
+    );
+
     const companiesList = isLoaded(this.props.companies)
       ? this.createCompanyList(this.props.companies)
       : []
     
     return (
-      <div className="form-container">
+      <div>
         <form onSubmit={this.handleSubmit}>
-          <h4>Sign In</h4>
-          <TextField
-            hintText="User name"
-            name="userName"
-            floatingLabelText="User name"
-            value={this.state.userName}
-            onChange={this.handleInputChange}
-            errorText={this.state.errors.userName} 
-          /><br />
-          <AutoComplete
-            hintText="Company"
-            name="companyName"
-            searchText={this.state.companyName}
-            value={this.state.companyName}
-            floatingLabelText="Company"
-            filter={AutoComplete.fuzzyFilter}
-            dataSourceConfig={{ text: 'name', value: 'key' }}
-            dataSource={companiesList}
-            maxSearchResults={5}
-            onUpdateInput={(value) => { this.handleUpdateAutoComplete(value) }}
-            onNewRequest={this.handleNewRequest}
-            errorText={this.state.errors.company} 
-         /><br />
-          <TextField
-            hintText="Email"
-            name="email"
-            floatingLabelText="Email"
-            value={this.state.email}
-            onChange={this.handleInputChange} 
-            errorText={this.state.errors.email}
-          /><br />
-          <TextField
-            hintText="Password"
-            name="password"
-            floatingLabelText="Password"
-            type="password"
-            value={this.state.password}
-            onChange={this.handleInputChange}
-            errorText={this.state.errors.password} 
-          /><br />
-          <TextField
-            hintText="Confirm password"
-            name="confirmPassword"
-            floatingLabelText="Confirm password"
-            type="password"
-            value={this.state.confirmPassword}
-            onChange={this.handleInputChange}
-            errorText={this.state.errors.confirmPassword} 
-          /><br />
-          <div className="submit-button">
-            <RaisedButton label="Sumbit" primary={true} onClick={this.handleSubmit} disabled={this.state.formInvalid}/>
+          {renderRedirect}
+          <div className="form-container">
+            <div className="form-header">
+              <h4>Sign In</h4>
+            </div>
+            <div className="form-body">
+              <TextField
+                hintText="User name"
+                name="userName"
+                floatingLabelText="User name"
+                value={this.state.userName}
+                onChange={this.handleInputChange}
+                errorText={this.state.errors.userName} /><br />
+              <AutoComplete
+                hintText="Company"
+                name="companyName"
+                searchText={this.state.companyName}
+                value={this.state.companyName}
+                floatingLabelText="Company"
+                filter={AutoComplete.fuzzyFilter}
+                dataSourceConfig={{ text: 'name', value: 'key' }}
+                dataSource={companiesList}
+                maxSearchResults={5}
+                onUpdateInput={(value) => { this.handleUpdateAutoComplete(value) }}
+                onNewRequest={this.handleNewRequest}
+                errorText={this.state.errors.company} /><br />
+              <TextField
+                hintText="Email"
+                name="email"
+                floatingLabelText="Email"
+                value={this.state.email}
+                onChange={this.handleInputChange} 
+                errorText={this.state.errors.email} /><br />
+              <TextField
+                hintText="Password"
+                name="password"
+                floatingLabelText="Password"
+                type="password"
+                value={this.state.password}
+                onChange={this.handleInputChange}
+                errorText={this.state.errors.password} /><br />
+              <TextField
+                hintText="Confirm password"
+                name="confirmPassword"
+                floatingLabelText="Confirm password"
+                type="password"
+                value={this.state.confirmPassword}
+                onChange={this.handleInputChange}
+                errorText={this.state.errors.confirmPassword} /><br />
+            </div>
+            <div className="form-footer">
+              <RaisedButton 
+                label="Sumbit" 
+                primary={true}  
+                disabled={this.state.formInvalid}
+                onClick={this.handleSubmit} />
+            </div>
           </div>
         </form>
-      </div>
+        <Snackbar
+          open={this.state.open}
+          message="Registration successfully completed"
+          autoHideDuration={3000}
+          onRequestClose={this.handleRequestClose} />
+    </div>
     )
   }
 }

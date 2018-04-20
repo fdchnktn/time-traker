@@ -1,0 +1,15 @@
+@import '../../../../styles/base';
+
+.circle {
+  @extend .circle;
+  font-size: $extraLargeFont;
+  font-weight: 700;
+  width: $largeCircle;
+  height: $largeCircle;
+  color: $white;
+  background: $lightgreen;
+}
+
+.slider {
+  width: 88%;
+}

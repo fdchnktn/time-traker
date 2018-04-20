@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import './styles.css';
-import CompanyName from '../../blocks/CompanyName/CompanyName'
-import Authorization from '../../../components/controls/Authorization/Authorization'
+import CompanyName from  'components/blocks/CompanyName/CompanyName'
+import Authorization from 'components/controls/Authorization/Authorization'
+import './Navbar.scss'
 
 class Navbar extends Component {
   render() {
     return (
-      <div className="Navbar">
+      <div className="navbar-container">
         <CompanyName /> 
         <Authorization />
       </div>

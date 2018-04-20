@@ -1,9 +1,14 @@
-import { REQUEST_REPORTS, RESPONSE_REPORTS, FAILURE_RESPONSE_REPORTS } from './types'
+import { REQUEST_REPORTS, RESPONSE_REPORTS, FAILURE_RESPONSE_REPORTS, SEND_REPORT_DATE_TO_CALENDAR } from './types'
 import { database } from '../store/store'
 
-export const requestReports = userId => ({
+export const sendReportDateToCalendar = (date) => ({
+  type: SEND_REPORT_DATE_TO_CALENDAR,
+  date
+})
+
+export const requestReports = (userId) => ({
   type: REQUEST_REPORTS,
-  userId,
+  userId
 })
 
 export const responseReports = (userId, reports)  => ({
@@ -20,7 +25,7 @@ export const failureResponseReports = (userId, startDate, endDate)  => ({
 })
 
 const getReports = (userId, startDate, endDate) => dispatch => {
-  dispatch(requestReports(userId))
+  dispatch(requestReports(userId, startDate, endDate))
   try {
     getReportsByUserId(userId, startDate, endDate).then(reports => {
       dispatch(responseReports(userId, reports))
@@ -31,7 +36,7 @@ const getReports = (userId, startDate, endDate) => dispatch => {
 }
 
 const getReportsByUserId = (userId, startDate, endDate) => {
-  console.log('userId', userId, 'startDate',  startDate, 'endDate', endDate)
+  console.log('userId', userId, 'startDate',  new Date(startDate), 'endDate', new Date(endDate))
   return database.ref(`reports/${userId}`).orderByChild('date').startAt(startDate).endAt(endDate).once('value')
     .then((snap) => {
       return snap.val();

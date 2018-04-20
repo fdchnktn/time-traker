@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
-import './styles.css'
-import MakeReport from '../../inputs/buttons/MakeReport/MakeReport'
-import CalendarContainer from '../CalendarContainer/CalendarContainer'
+import MakeReport from 'components/inputs/buttons/MakeReport/MakeReport'
+import CalendarContainer from 'components/pages/CalendarContainer/CalendarContainer'
+import './styles.scss'
 
 export default class ReportsDashboard extends Component {
   render() {
     return (
-      <div className="container">
-        <div className="dashboard">
+      <div className="page-container">
+        <div className="dashboard" >
           <CalendarContainer />
           <MakeReport />
         </div>

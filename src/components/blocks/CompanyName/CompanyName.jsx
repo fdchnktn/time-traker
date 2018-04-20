@@ -2,9 +2,9 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { isLoaded, getVal, isEmpty } from 'react-redux-firebase'
-import './styles.css'
-import { defaultName } from '../../../constants'
-import { getUserCompany } from '../../../actions/companyAction'
+import { defaultName } from 'constants.js'
+import { getUserCompany } from 'actions/companyAction'
+import './styles.scss'
 
 class CompanyName extends Component {
 
@@ -21,7 +21,7 @@ class CompanyName extends Component {
      : <span>{defaultName}</span>
 
     return (
-      <div className="home-link">
+      <div className="companyName">
         <Link to='/reports'>{companyName}</Link>
       </div>
     )
@@ -34,7 +34,6 @@ const mapStateToProps = (state) => {
     companyName: state.company.name
   } 
 };
-
 
 const mapDispatchToProps = dispatch => {
   return {

@@ -4,8 +4,7 @@ import Loader from 'react-loader-spinner'
 import { withFirebase } from 'react-redux-firebase'
 import TextField from 'material-ui/TextField'
 import RaisedButton from 'material-ui/RaisedButton'
-import './styles.css'
-import '../../../styles/elements.css'
+import './styles.scss'
 
 class SignInForm extends Component {
   constructor(props) {
@@ -80,14 +79,14 @@ class SignInForm extends Component {
     }
   }
 
-  handleSubmit(event) {
+  handleSubmit(e) {
+    e.preventDefault();
+    
     this.setState({ 
       isLoading: true 
     });
 
     this.signInUser(this.state.email, this.state.password);
-
-    event.preventDefault();
   }
 
 
@@ -128,32 +127,38 @@ class SignInForm extends Component {
         width="100"
       />
     ) : (
-        <div className="form-container">
-          <form id="form" onSubmit={this.handleSubmit}>
+          <form onSubmit={this.handleSubmit}>
             {renderRedirect}
-            <h3 className="form-header">Log In</h3>
-            <TextField
-              hintText="Email"
-              name="email"
-              type="text"
-              floatingLabelText="Email"
-              value={this.state.email}
-              onChange={this.handleInputChange}
-              errorText={this.state.error}
-            /><br />
-            <TextField
-              hintText="Password"
-              name="password"
-              floatingLabelText="Password"
-              type="password"
-              value={this.state.password}
-              onChange={this.handleInputChange}
-            /><br />
-            <div className="submit-button">
-              <RaisedButton label="Sumbit" primary={true} onClick={this.handleSubmit} disabled={this.state.formInvalid} />
+            <div className="form-container">
+            <div className="form-header">
+              <h3 >Log In</h3>
             </div>
-          </form>
-        </div>
+            <div className="form-body">
+              <TextField
+                  hintText="Email"
+                  name="email"
+                  type="text"
+                  floatingLabelText="Email"
+                  value={this.state.email}
+                  onChange={this.handleInputChange}
+                  errorText={this.state.error} /><br />
+                <TextField
+                  hintText="Password"
+                  name="password"
+                  floatingLabelText="Password"
+                  type="password"
+                  value={this.state.password}
+                  onChange={this.handleInputChange} /><br />
+            </div>
+            <div className="form-footer">
+              <RaisedButton
+                label="Sumbit"
+                primary={true} 
+                disabled={this.state.formInvalid}
+                onClick={this.handleSubmit} />
+            </div>
+          </div>
+        </form>
       );
 
     return (

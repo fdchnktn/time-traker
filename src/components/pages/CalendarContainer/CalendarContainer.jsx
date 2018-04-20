@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { isLoaded, getVal } from 'react-redux-firebase'
-import Calendar from '../Calendar/Calendar'
-import { getReportsForOneMonth } from '../../../actions/reportsAction'
-import * as reports from './mock.json'
+import Loader from 'react-loader-spinner'
+import Calendar from 'components/pages/Calendar/Calendar'
+import { getReportsForOneMonth } from 'actions/reportsAction'
 
 
 class CalendarContainer extends Component {
@@ -12,59 +12,99 @@ class CalendarContainer extends Component {
 
     const date = new Date();
 
+    const { firstDayOfMonth, lastDayOfMonth } = this.getMonthRanges(date);
+
     this.state = {
-      timePeriod: this.getTimePeriodForCurrentMonth(date)  
+      start: firstDayOfMonth,
+      end: lastDayOfMonth,
+      currentDate: date 
     };
+
+    this.getMonthRanges = this.getMonthRanges.bind(this);
+    this.changeMonthAndGetReports = this.changeMonthAndGetReports.bind(this);
   }
 
-  getTimePeriodForCurrentMonth(date) {
+  getMonthRanges(date) {
     const year = date.getFullYear()
     const month = date.getMonth();
 
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
   
+    console.log(`first day`, firstDay)
+    console.log(`last day`, lastDay)
+
     return {
-      start: firstDay.getTime(),
-      end: lastDay.getTime() 
+      firstDayOfMonth: firstDay.getTime(),
+      lastDayOfMonth: lastDay.getTime() 
     }
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.auth !== this.props.auth) {
       const { dispatch, auth } = nextProps;
-      auth.uid && this.props.getReports(auth.uid, this.state.timePeriod.start, this.state.timePeriod.end)
+      const { start, end } = this.state;
+
+      auth.uid && this.props.getReports(auth.uid, start, end)
+    }
+
+    if (nextProps.reportDate !== this.props.reportDate) {
+      const reportDate = nextProps.reportDate;
+
+      this.changeMonthAndGetReports(reportDate);
     }
   }
 
-  changeMonth(date) {
-    console.log( `change month`, date);
+  changeMonthAndGetReports(date) {
+    const { firstDayOfMonth, lastDayOfMonth } = this.getMonthRanges(date);
+    const { dispatch, auth } = this.props;
+
+    this.setState({
+      start: firstDayOfMonth,
+      end: lastDayOfMonth,
+      currentDate: date
+    });
+    
+    this.props.getReports(auth.uid, firstDayOfMonth, lastDayOfMonth);
   }
 
-  createReports(reports) {
+  modifyReportsList(reports) {
     let reportsList = [];
     for (const key in reports) {
       if (reports.hasOwnProperty(key)) {
         const report = reports[key];
         const date = new Date(report.date);
-        reportsList.push({day: date.getDay(), hours: report.hours})
+        reportsList.push({day: date.getDate(), hours: report.hours})
       }
     }
 
-    console.log(reportsList);
     return reportsList;
   }
 
   render() {
     const reports = isLoaded(this.props.reports) 
-      ? this.createReports(this.props.reports)
-      : [];
+    ? this.modifyReportsList(this.props.reports)
+    : [];
+
+    
+
+    const content = isLoaded(this.props.reports)
+      ? (
+        <Calendar
+          reports={reports}
+          onMonthChange={this.changeMonthAndGetReports}
+          currentDate={this.state.currentDate} />
+      ) : (
+        <Loader
+          type="Puff"
+          color="#00BFFF"
+          height="100"
+          width="100" />
+      )
 
     return (
       <div>
-        <Calendar
-          reports={reports}
-          onMonthChange={this.changeMonth} />
+        {content}
       </div>
     )
   }
@@ -73,7 +113,8 @@ class CalendarContainer extends Component {
 const mapStateToProps = (state) => {
   return {
     auth: getVal(state.firebase, 'auth'),
-    reports: state.reports.data.reports
+    reports: state.reports.data.reports,
+    reportDate: state.reports.reportDate
   } 
 };
 
@@ -86,23 +127,3 @@ const mapDispatchToProps = dispatch => {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(CalendarContainer)
-
-/*
-export default compose(
-  firebaseConnect(
-    (props, store) => {
-      const { firebase: { auth } } = store.getState()
-      console.log('auth', auth)
-      return [{ 
-        path: `reports/${auth.uid || ''}`/*,
-        queryParams: [ 
-          `orderByChild=added`,
-          `startAt=${this.state.start}`,
-          `endAt=${this.state.end}` ]
-        }]
-    }
-  ),
-  connect((state) => ({
-    reports: state.firebase.data
-  }))
-)(CalendarContainer);*/

@@ -1,0 +1,9 @@
+@import '../../../styles/base';
+
+.navbar-container {
+  @extend .navbar;
+  @extend .flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70px;
+}

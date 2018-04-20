@@ -1,9 +1,3 @@
-a {
-  font-size: 1em;
-  color: white;
-  text-decoration: none;
-  margin-left: 10px;
-}
 
 form {
   text-align: left;
@@ -14,16 +8,6 @@ form {
   justify-content: center;
 }
 
-.nav-button {
-  border: 1px solid lightgray;
-  border-radius: 6px;
-  margin-left: 6px;
-  border-spacing: inherit;
-  font-size: 20px;
-  padding: 5px;
-  background: #222;
-  color: white;
-}
 
 .submit-button {
   display: flex;

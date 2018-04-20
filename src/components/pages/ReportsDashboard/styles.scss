@@ -1,0 +1,7 @@
+@import '../../../styles/base';
+
+.dashboard {
+  display: flex;
+  justify-content: space-around;
+  margin-top: $largeMargin;
+}

@@ -1,0 +1,60 @@
+@import '../../../styles/base.scss';
+
+.cell {
+  @extend .cell;
+  position: relative;
+}
+
+.date {
+  position: absolute;
+  font-size: $fontSize;
+}
+
+.hours {
+  @extend .circle;
+  bottom: 0;
+  right: $mediumCircle;
+  position: absolute;
+  height: $mediumCircle;
+  width: $mediumCircle;
+  font-size: $smallFont * 1.6;
+  font-weight: $boldFont;
+  color: $white;
+  background: $lightgreen;
+}
+
+.DayPicker-Month .DayPicker-Caption {
+  text-align: center;
+}
+
+.hours-none {
+  display: none;
+}
+
+.hours-small {
+  background: $shortDay;
+}
+
+.hourse-medium {
+  background:$meduimDay;
+}
+
+.hours-lagre {
+  background: $longDay;
+}
+
+.cell {
+  height: $cellSize;
+  width: $cellSize;
+  position: relative;
+}
+
+.date {
+  position: absolute;
+  font-size: $fontSize;
+}
+
+
+.DayPicker-Weekday {
+  text-align: left;
+}
